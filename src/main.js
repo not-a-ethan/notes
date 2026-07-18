@@ -23,6 +23,41 @@ function getNotes() {
   };
 };
 
+function createNote(name, parentPath) {
+  fs.writeFileSync(path.join(homedir, parentPath, `${name}.md`), "", err => {
+    if (e) {
+      console.error(e)
+    }
+  });
+};
+
+function createFolder(name, parentPath) {
+  try {
+    fs.mkdirSync(path.join(homedir, parentPath, name));
+  } catch (e) {
+    console.error(e);
+    return false;
+  };
+
+  return true;
+};
+
+function deleteNote(filePath) {
+  if (!fs.existsSync(path.join(homedir, "notes", filePath))) {
+    return false;
+  } else {
+    try {
+      fs.rmSync(path.join(homedir, "notes", filePath));
+    } catch (e) {
+      console.error(e);
+
+      return false;
+    };
+  }
+
+  return true;
+};
+
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
@@ -41,11 +76,35 @@ const createWindow = () => {
 app.whenReady().then(() => {
   createWindow();
 
-  ipcMain.on('request-data-from-main', (event, payloadFromRenderer) => {
+  ipcMain.on('getFS', (event, payloadFromRenderer) => {
     const stuff = getNotes();
 
-    event.reply("data-from-main-response", stuff)
-  })
+    event.reply("fsResponse", stuff);
+  });
+
+  ipcMain.on("createFolder", (event, payloadFromRenderer) => {
+    if (!createFolder(payloadFromRenderer["name"], payloadFromRenderer["parentPath"])) {
+      event.reply("createFolderResponse", "Something went wrong created folder");
+    } else {
+      event.reply("createFolderResponse", "It worked");
+    };
+  });
+
+  ipcMain.on("createNote", (event, payloadFromRenderer) => {
+    if (!createNote(payloadFromRenderer["title"], payloadFromRenderer["parentPath"])) {
+      event.reply("createNoteResponse", "Something went wrong creating the note");
+    } else {
+      event.reply("createNoteResponse", "It worked");
+    };
+  });
+  
+  ipcMain.on("deleteNote", (event, payloadFromRenderer) => {
+    if (!deleteNote(payloadFromRenderer["filePath"])) {
+      event.reply("deleteNoteResponse", "Something went wrong deleting the note");
+    } else {
+      event.reply("deleteNoteResponse", "It worked")
+    };
+  });
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

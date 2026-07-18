@@ -1,13 +1,17 @@
-// const { ipcRenderer } = require('electron');
-
 function dataFromMain() {
-    const data = {};
+    window.electronAPI.send("getFS", {});
 
-    window.electronAPI.send("request-data-from-main", data);
-
-    window.electronAPI.on("data-from-main-response", (event, data) => {
+    window.electronAPI.on("fsResponse", (event, data) => {
         console.log(data);
     })
 }
 
-dataFromMain();
+// Code to make a folder
+//window.electronAPI.send("createFolder", {name: "a great name", parentPath: "notes"});
+
+// Code to make a note
+//window.electronAPI.send("createNote", { title: "Amazing note", parentPath: "notes" });
+
+// Code to delete a note
+window.electronAPI.send("deleteNote", { filePath: "thingy.md" });
+
