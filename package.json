@@ -1,0 +1,23 @@
+{
+  "name": "notes",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/not-a-ethan/notes#readme",
+  "bugs": {
+    "url": "https://github.com/not-a-ethan/notes/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/not-a-ethan/notes.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^43.1.0"
+  }
+}
