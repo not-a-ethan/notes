@@ -17,11 +17,13 @@ window.electronAPI.on("fsResponse", (event, data) => {
 
         const dropDown = document.createElement("details");
         dropDown.id = `${thisFolder.parentPath}/${thisFolder.name}`;
+        dropDown.className = "folder"
 
-        const sumamry = document.createElement("summary");
-        sumamry.innerText = thisFolder.name;
+        const summary = document.createElement("summary");
+        summary.innerText = thisFolder.name;
+        summary.className = "folderName"
 
-        dropDown.appendChild(sumamry);
+        dropDown.appendChild(summary);
 
         if (rootNotes === thisFolder.parentPath) {
             // Root level folders
@@ -48,6 +50,7 @@ window.electronAPI.on("fsResponse", (event, data) => {
         if (thisFile.parentPath === rootNotes) {
             // Root level notes
             fileTree.appendChild(btn);
+            fileTree.appendChild(document.createElement("br"));
         } else {
             // Child level notes
             const margin = ((thisFile.parentPath.split("/").length) - 3) * 5
@@ -56,6 +59,7 @@ window.electronAPI.on("fsResponse", (event, data) => {
 
             const parentElm = document.getElementById(thisFile.parentPath);
             parentElm.appendChild(btn);
+            parentElm.appendChild(document.createElement("br"));
         };
     };
 
@@ -70,6 +74,7 @@ window.electronAPI.on("fsResponse", (event, data) => {
         if (thisFile.parentPath === rootNotes) {
             // Root level notes
             fileTree.appendChild(btn);
+            fileTree.appendChild(document.createElement("br"));
         } else {
             // Child level notes
             const margin = ((thisFile.parentPath.split("/").length) - 3) * 5
@@ -78,6 +83,7 @@ window.electronAPI.on("fsResponse", (event, data) => {
 
             const parentElm = document.getElementById(thisFile.parentPath);
             parentElm.appendChild(btn);
+            parentElm.appendChild(document.createElement("br"));
         };
     };
 });

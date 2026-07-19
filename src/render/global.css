@@ -42,6 +42,15 @@ body {
     top: 50%;
 }
 
+.file, .folderName {
+    width: fit-content;
+
+    padding-left: 2px;
+    padding-right: 2px;
+
+    margin-top: 5px;
+}
+
 .file {
     background-color: white;
     border: none;
@@ -49,8 +58,9 @@ body {
     cursor: pointer;
 }
 
-.mdFile {
-
+.file:hover, .folderName:hover {
+    background-color: lightgray;
+    border-radius: 5px;
 }
 
 .otherFile {
