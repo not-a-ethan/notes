@@ -122,6 +122,7 @@ function handleNewFileName() {
 
     input.addEventListener("focusout", (e) => {
         createFile();
+
         return;
     });
 
@@ -177,7 +178,7 @@ function handleNewFolderName() {
     input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
             createFolder();
-
+            
             return;
         };
     });

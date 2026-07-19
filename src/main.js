@@ -59,6 +59,18 @@ function deleteNote(filePath) {
   return true;
 };
 
+function getNote(filePath) {
+  try {
+    const data = fs.readFileSync(path.join(homedir, "notes", filePath), { encoding: "utf8", flag: "r"});
+    
+    return data;
+  } catch (e) {
+    console.error(e);
+
+    return false;
+  };
+};
+
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
@@ -105,6 +117,12 @@ app.whenReady().then(() => {
     } else {
       event.reply("deleteNoteResponse", "It worked")
     };
+  });
+
+  ipcMain.on("getNote", (event, payloadFromRenderer) => {
+    const content = getNote(payloadFromRenderer["filePath"]);
+
+    event.reply("noteContents", content);
   });
 
   app.on('activate', () => {
