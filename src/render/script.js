@@ -88,8 +88,105 @@ window.electronAPI.on("fsResponse", (event, data) => {
     };
 });
 
+// Functions to create new md files
+function createFileNameInput(e) {
+    e.preventDefault();
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.id = "newFileName"
+
+    fileTree.append(nameInput);
+
+    document.getElementById("newFileName").focus();
+
+    handleNewFileName();
+};
+
+function createFile() {
+    const input = document.getElementById("newFileName");
+
+    if (input.value.trim().length === 0) {
+        input.remove()
+
+        return;
+    };
+
+    window.electronAPI.send("createNote", { title: input.value, parentPath: "notes" });
+
+    input.remove()
+};
+
+function handleNewFileName() {
+    const input = document.getElementById("newFileName");
+
+    input.addEventListener("focusout", (e) => {
+        createFile();
+        return;
+    });
+
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            createFile();
+
+            return;
+        };
+    });
+};
+
+document.getElementById("createFile").addEventListener("click", createFileNameInput)
+
+// Functions to create new folders
+function createFolderNameInput(e) {
+    e.preventDefault();
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.id = "newFolderName"
+
+    fileTree.append(nameInput);
+
+    document.getElementById("newFolderName").focus();
+
+    handleNewFolderName();
+};
+
+function createFolder() {
+    const input = document.getElementById("newFolderName");
+
+    if (input.value.trim().length === 0) {
+        input.remove()
+
+        return;
+    };
+
+    window.electronAPI.send("createFolder", { name: input.value, parentPath: "notes" });
+
+    input.remove()
+};
+
+function handleNewFolderName() {
+    const input = document.getElementById("newFolderName");
+
+    input.addEventListener("focusout", (e) => {
+        createFolder();
+
+        return;
+    });
+
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            createFolder();
+
+            return;
+        };
+    });
+};
+
+document.getElementById("createFolder").addEventListener("click", createFolderNameInput)
+
 // Code to make a folder
-//window.electronAPI.send("createFolder", {name: "a great name", parentPath: "notes"});
+//window.electronAPI.send("createFolder", { name: "a great name", parentPath: "notes" });
 
 // Code to make a note
 //window.electronAPI.send("createNote", { title: "Amazing note", parentPath: "notes" });
