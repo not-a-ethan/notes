@@ -1,5 +1,6 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
-const path = require('path')
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
+const { shell } = require('electron/common');
+const path = require('path');
 const fs = require('node:fs');
 const homedir = require('os').homedir();
 
@@ -61,7 +62,7 @@ function deleteNote(filePath) {
 
 function getNote(filePath) {
   try {
-    const data = fs.readFileSync(path.join(homedir, "notes", filePath), { encoding: "utf8", flag: "r"});
+    const data = fs.readFileSync(path.join(filePath), { encoding: "utf8", flag: "r"});
     
     return data;
   } catch (e) {
@@ -69,6 +70,18 @@ function getNote(filePath) {
 
     return false;
   };
+};
+
+function writeNote(filePath, content) {
+  try {
+    fs.writeFileSync(filePath, content);
+  } catch (e) {
+    console.error(e);
+
+    return false;
+  };
+
+  return true;
 };
 
 const createWindow = () => {
@@ -83,8 +96,60 @@ const createWindow = () => {
     },
   });
 
+  const template = [
+    ...(process.platform === 'darwin'
+      ? [{ role: 'appMenu' }]
+      : []),
+    { role: 'fileMenu' },
+      {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        {
+          role: "save",
+          label: "Save",
+          accelerator: "CommandOrControl+S",
+          click: () => {
+            win.webContents.send("request-save")
+          }
+        },
+        ...(isMac
+          ? [
+              { role: 'pasteAndMatchStyle' },
+              { role: 'delete' },
+              { role: 'selectAll' },
+              { type: 'separator' },
+              {
+                label: 'Speech',
+                submenu: [
+                  { role: 'startSpeaking' },
+                  { role: 'stopSpeaking' }
+                ]
+              }
+            ]
+          : [
+              { role: 'delete' },
+              { type: 'separator' },
+              { role: 'selectAll' }
+            ])
+      ]
+    },
+    { role: 'viewMenu' },
+    { role: 'windowMenu' },
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+
   win.loadFile('src/render/index.html');
 }
+
+const isMac = process.platform === 'darwin'
 
 app.whenReady().then(() => {
   createWindow();
@@ -111,7 +176,7 @@ app.whenReady().then(() => {
     };
   });
   
-  ipcMain.on("deleteNote", (event, payloadFromRenderer) => {
+  ipcMain.on("deleteNote", (event, payloadFromRenderer) => { 
     if (!deleteNote(payloadFromRenderer["filePath"])) {
       event.reply("deleteNoteResponse", "Something went wrong deleting the note");
     } else {
@@ -124,6 +189,15 @@ app.whenReady().then(() => {
 
     event.reply("noteContents", content);
   });
+
+  ipcMain.on("saveNote", (event, payloadFromRenderer) => {
+    const filePath = payloadFromRenderer["filePath"];
+    const content = payloadFromRenderer["content"];
+
+    writeNote(filePath, content);
+  });
+
+  
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

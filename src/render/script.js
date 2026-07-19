@@ -1,11 +1,13 @@
 window.electronAPI.send("getFS", {});
 
 const fileTree = document.getElementById("fs");
+const editPane = document.getElementById("note");
+
+// Var stores the current file open. Used when saving files
+let currentFilePath = "";
 
 // Render file structure
 window.electronAPI.on("fsResponse", (event, data) => {
-    console.log(data);
-
     const folders = data["folders"];
     const mdFiles = data["markdown"];
     const otherFiles = data["other"];
@@ -46,6 +48,8 @@ window.electronAPI.on("fsResponse", (event, data) => {
         const btn = document.createElement("button");
         btn.innerText = (thisFile.name).substring(0, thisFile.name.length - 3);
         btn.className = "file mdFile";
+        btn.id = thisFile.parentPath + "/" + thisFile.name;
+        btn.addEventListener("click", getNote);
 
         if (thisFile.parentPath === rootNotes) {
             // Root level notes
@@ -183,6 +187,33 @@ function handleNewFolderName() {
         };
     });
 };
+
+// Functions handling notes
+function getNote(e) {
+    const path = e.target.id;
+
+    window.electronAPI.send("getNote", { filePath: path });
+
+    window.electronAPI.on("noteContents", (event, data) => {
+        try {
+            document.getElementById("motto").style.display = "none";
+        } catch (e) {
+            console.error(e);
+        };
+
+        editPane.value = data;
+        currentFilePath = path;
+    });
+};
+
+// Save file from window menu
+window.electronAPI.requestSave(() => {
+    if (currentFilePath.trim().length === 0) {
+        return;
+    };
+    
+    window.electronAPI.send("saveNote", { filePath: currentFilePath, content: editPane.value });
+});
 
 document.getElementById("createFolder").addEventListener("click", createFolderNameInput)
 
