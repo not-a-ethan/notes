@@ -19,7 +19,8 @@ function getNotes() {
   return {
     folders: folders,
     markdown: mdFiles,
-    other: otherFiles
+    other: otherFiles,
+    root: path.join(homedir, "notes")
   };
 };
 
@@ -70,7 +71,7 @@ const createWindow = () => {
     },
   });
 
-  win.loadFile('src/index.html');
+  win.loadFile('src/render/index.html');
 }
 
 app.whenReady().then(() => {
